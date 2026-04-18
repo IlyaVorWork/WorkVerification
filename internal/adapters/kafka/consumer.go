@@ -2,6 +2,7 @@ package kafka
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -50,6 +51,7 @@ func NewConsumer(cfg ConsumerConfig, handler Handler) *Consumer {
 }
 
 func (c *Consumer) Run(ctx context.Context) error {
+	fmt.Println("consumer started")
 	for {
 		msg, err := c.reader.FetchMessage(ctx)
 		if err != nil {

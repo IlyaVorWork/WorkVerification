@@ -25,7 +25,7 @@ func main() {
 	minioSecretKey := getEnv("MINIO_SECRET_KEY", "password123")
 	minioBucket := getEnv("MINIO_BUCKET", "app-builds")
 	kafkaBroker := getEnv("KAFKA_BROKER", "localhost:9092")
-	emulatorHost := getEnv("EMULATOR_HOST", "emulator")
+	emulatorHost := getEnv("EMULATOR_HOST", "localhost")
 	emulatorPort := getEnv("EMULATOR_PORT", "5555")
 
 	minioClient := s3.NewMinio(minioBucket, minioEndpoint, minioAccessKey, minioSecretKey)

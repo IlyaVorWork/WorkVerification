@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -24,6 +25,13 @@ func (s *Service) Verify(fileName string) error {
 	fmt.Println("Verifying file:", fileName)
 
 	file, err := s.fileStorage.GetFile(fileName)
+	if err != nil {
+		return err
+	}
+
+	ctx := context.Background()
+
+	err = s.adbClient.Verify(ctx, file.Name())
 	if err != nil {
 		return err
 	}
