@@ -54,21 +54,22 @@ func (adb *ADB) connect(ctx context.Context) error {
 	return nil
 }
 
-func (adb *ADB) clearLogcat(ctx context.Context) error {
-	ctx, cancel := adb.withTimeout(ctx, 3*time.Second)
+func (adb *ADB) clearLogcat(ctx context.Context) {
+	ctx, cancel := adb.withTimeout(ctx, 10*time.Second)
 	defer cancel()
 
-	_, err := adb.run(ctx, "logcat", "-c")
-	return err
+	if _, err := adb.run(ctx, "logcat", "-c"); err != nil {
+		log.Printf("clearLogcat warning (non-fatal): %v", err)
+	}
 }
 
 func (adb *ADB) install(ctx context.Context, apkPath string) error {
-	ctx, cancel := adb.withTimeout(ctx, 30*time.Second)
+	ctx, cancel := adb.withTimeout(ctx, 120*time.Second)
 	defer cancel()
 
 	out, err := adb.run(ctx, "install", "-r", apkPath)
 	if err != nil {
-		return fmt.Errorf("install failed: %s", out)
+		return fmt.Errorf("install failed: %w (output: %s)", err, out)
 	}
 
 	// adb иногда возвращает Success в stdout
@@ -205,10 +206,8 @@ func (adb *ADB) Verify(ctx context.Context, apkPath string) error {
 
 	defer adb.kill(ctx)
 
-	// 2. очистить лог
-	if err := adb.clearLogcat(ctx); err != nil {
-		return err
-	}
+	// 2. очистить лог (non-fatal)
+	adb.clearLogcat(ctx)
 
 	// 3. install
 	if err := adb.install(ctx, apkPath); err != nil {
